@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Smart College Assistant - AI-based Student Support System. Login to access your dashboard.">
+    <title>Smart College Assistant | Login</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .role-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        .role-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition-normal);
+        }
+        .role-tab.active {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: var(--primary);
+            color: var(--primary-light);
+        }
+        .role-tab:hover:not(.active) {
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+        .features-preview {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 32px;
+            z-index: 1;
+        }
+        .feature-item {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        .feature-item .icon {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-page">
+        <div class="login-bg-effects">
+            <div class="orb"></div>
+            <div class="orb"></div>
+            <div class="orb"></div>
+        </div>
+
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="login-logo">🎓</div>
+                    <h1>Smart College Assistant</h1>
+                    <p>AI-Powered Student Support System</p>
+                </div>
+
+                <div class="role-tabs">
+                    <div class="role-tab active" onclick="selectRole('student')">
+                        🎒 Student
+                    </div>
+                    <div class="role-tab" onclick="selectRole('admin')">
+                        ⚙️ Admin
+                    </div>
+                </div>
+
+                <div id="login-error" class="login-error"></div>
+
+                <form id="login-form" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <div class="input-icon-wrapper">
+                            <span class="icon">👤</span>
+                            <input type="text" id="username" class="form-input" placeholder="Enter your username" required autocomplete="username">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password</label>
+                        <div class="input-icon-wrapper">
+                            <span class="icon">🔒</span>
+                            <input type="password" id="password" class="form-input" placeholder="Enter your password" required autocomplete="current-password">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" checked> Remember me
+                        </label>
+                        <a href="#" class="forgot-link">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary login-btn" id="login-btn">
+                        <span>Sign In</span>
+                        <span>→</span>
+                    </button>
+                </form>
+
+                <div class="demo-creds">
+                    <h4>Demo Credentials</h4>
+                    <p>Student: <code>student1</code> / <code>student123</code></p>
+                    <p>Admin: <code>admin</code> / <code>admin123</code></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="features-preview">
+            <div class="feature-item">
+                <span class="icon">📅</span>
+                Calendar
+            </div>
+            <div class="feature-item">
+                <span class="icon">📝</span>
+                Exams
+            </div>
+            <div class="feature-item">
+                <span class="icon">🎊</span>
+                Events
+            </div>
+            <div class="feature-item">
+                <span class="icon">🤖</span>
+                AI Chat
+            </div>
+            <div class="feature-item">
+                <span class="icon">📊</span>
+                Analytics
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        let selectedRole = 'student';
+
+        function selectRole(role) {
+            selectedRole = role;
+            document.querySelectorAll('.role-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.closest('.role-tab').classList.add('active');
+            
+            // Auto-fill demo creds
+            if (role === 'student') {
+                document.getElementById('username').value = 'student1';
+                document.getElementById('password').value = 'student123';
+            } else {
+                document.getElementById('username').value = 'admin';
+                document.getElementById('password').value = 'admin123';
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const errorEl = document.getElementById('login-error');
+            const btn = document.getElementById('login-btn');
+            errorEl.style.display = 'none';
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            btn.innerHTML = '<span class="spinner" style="width:20px;height:20px;border-width:2px;"></span>';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.error || 'Login failed');
+                }
+
+                // Store token and user info
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+
+                // Redirect based on role
+                if (data.user.role === 'admin') {
+                    window.location.href = '/admin.html';
+                } else {
+                    window.location.href = '/student.html';
+                }
+            } catch (err) {
+                errorEl.textContent = err.message;
+                errorEl.style.display = 'block';
+                btn.innerHTML = '<span>Sign In</span><span>→</span>';
+                btn.disabled = false;
+            }
+        }
+
+        // Check if already logged in
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            if (token && user) {
+                const userData = JSON.parse(user);
+                if (userData.role === 'admin') {
+                    window.location.href = '/admin.html';
+                } else {
+                    window.location.href = '/student.html';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

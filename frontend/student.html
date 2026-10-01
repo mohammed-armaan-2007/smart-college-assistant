@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Smart College Assistant - Student Dashboard. View events, calendar, exams, and more.">
+    <title>Student Dashboard | Smart College Assistant</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar Overlay (mobile) -->
+        <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">🎓</div>
+                <div class="sidebar-brand">
+                    <h2>College Assistant</h2>
+                    <span>Student Portal</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Main</div>
+                <div class="nav-item active" onclick="navigateTo('dashboard', this)" id="nav-dashboard">
+                    <span class="icon">📊</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('calendar', this)" id="nav-calendar">
+                    <span class="icon">📅</span>
+                    <span>Calendar</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('events', this)" id="nav-events">
+                    <span class="icon">🎊</span>
+                    <span>Events</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('exams', this)" id="nav-exams">
+                    <span class="icon">📝</span>
+                    <span>Exam Schedule</span>
+                </div>
+
+                <div class="nav-section-title">Academics</div>
+                <div class="nav-item" onclick="navigateTo('timetable', this)" id="nav-timetable">
+                    <span class="icon">🕐</span>
+                    <span>Timetable</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('assignments', this)" id="nav-assignments">
+                    <span class="icon">📋</span>
+                    <span>Assignments</span>
+                    <span class="badge" id="assignment-badge"></span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('attendance', this)" id="nav-attendance">
+                    <span class="icon">✅</span>
+                    <span>Attendance</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('grades', this)" id="nav-grades">
+                    <span class="icon">📈</span>
+                    <span>Grades</span>
+                </div>
+
+                <div class="nav-section-title">More</div>
+                <div class="nav-item" onclick="navigateTo('holidays', this)" id="nav-holidays">
+                    <span class="icon">🏖️</span>
+                    <span>Holidays</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('announcements', this)" id="nav-announcements">
+                    <span class="icon">📢</span>
+                    <span>Announcements</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('chatbot', this)" id="nav-chatbot">
+                    <span class="icon">🤖</span>
+                    <span>AI Assistant</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('profile', this)" id="nav-profile">
+                    <span class="icon">👤</span>
+                    <span>My Profile</span>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-user" onclick="navigateTo('profile', document.getElementById('nav-profile'))">
+                    <div class="sidebar-user-avatar" id="sidebar-avatar">A</div>
+                    <div class="sidebar-user-info">
+                        <div class="name" id="sidebar-name">Loading...</div>
+                        <div class="role">Student</div>
+                    </div>
+                </div>
+                <div class="nav-item" onclick="logout()" style="margin-top: 8px; color: var(--accent-rose);">
+                    <span class="icon">🚪</span>
+                    <span>Logout</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="topbar-toggle" onclick="toggleSidebar()">☰</button>
+                    <div class="topbar-search">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" placeholder="Search anything..." id="global-search">
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <div class="topbar-date" id="topbar-date"></div>
+                    <button class="topbar-btn" onclick="navigateTo('announcements', document.getElementById('nav-announcements'))" title="Notifications">
+                        🔔
+                        <span class="dot" id="notif-dot" style="display:none;"></span>
+                    </button>
+                    <button class="topbar-btn" onclick="navigateTo('chatbot', document.getElementById('nav-chatbot'))" title="AI Chat">🤖</button>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <div class="page-content">
+
+                <!-- ========== DASHBOARD ========== -->
+                <div class="content-section active" id="section-dashboard">
+                    <div class="page-header">
+                        <h1>Welcome back, <span class="text-gradient" id="welcome-name">Student</span> 👋</h1>
+                        <p>Here's what's happening at your college today</p>
+                    </div>
+
+                    <div class="stats-grid" id="dashboard-stats">
+                        <!-- Filled by JS -->
+                    </div>
+
+                    <div class="content-grid-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>📢 Recent Announcements</h3>
+                                <button class="btn btn-sm btn-outline" onclick="navigateTo('announcements', document.getElementById('nav-announcements'))">View All</button>
+                            </div>
+                            <div class="card-body no-pad" id="dashboard-announcements">
+                                <div class="loading-spinner"><div class="spinner"></div></div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>🎊 Upcoming Events</h3>
+                                <button class="btn btn-sm btn-outline" onclick="navigateTo('events', document.getElementById('nav-events'))">View All</button>
+                            </div>
+                            <div class="card-body no-pad" id="dashboard-events">
+                                <div class="loading-spinner"><div class="spinner"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-grid-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>📝 Upcoming Exams</h3>
+                            </div>
+                            <div class="card-body no-pad" id="dashboard-exams">
+                                <div class="loading-spinner"><div class="spinner"></div></div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>📋 Pending Assignments</h3>
+                            </div>
+                            <div class="card-body no-pad" id="dashboard-assignments">
+                                <div class="loading-spinner"><div class="spinner"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========== CALENDAR ========== -->
+                <div class="content-section" id="section-calendar">
+                    <div class="page-header">
+                        <h1>📅 Academic Calendar</h1>
+                        <p>All events, exams, holidays, and assignments in one view</p>
+                    </div>
+                    <div class="calendar-container" id="calendar-widget">
+                        <div class="loading-spinner"><div class="spinner"></div></div>
+                    </div>
+                </div>
+
+                <!-- ========== EVENTS ========== -->
+                <div class="content-section" id="section-events">
+                    <div class="page-header">
+                        <h1>🎊 Campus Events</h1>
+                        <p>Discover and participate in exciting events</p>
+                    </div>
+                    <div class="toolbar">
+                        <div class="toolbar-left">
+                            <span class="filter-chip active" onclick="filterEvents('all', this)">All</span>
+                            <span class="filter-chip" onclick="filterEvents('cultural', this)">🎭 Cultural</span>
+                            <span class="filter-chip" onclick="filterEvents('workshop', this)">🔧 Workshop</span>
+                            <span class="filter-chip" onclick="filterEvents('sports', this)">⚽ Sports</span>
+                            <span class="filter-chip" onclick="filterEvents('seminar', this)">📚 Seminar</span>
+                            <span class="filter-chip" onclick="filterEvents('placement', this)">💼 Placement</span>
+                        </div>
+                    </div>
+                    <div class="events-grid" id="events-grid">
+                        <div class="loading-spinner"><div class="spinner"></div></div>
+                    </div>
+                </div>
+
+                <!-- ========== EXAMS ========== -->
+                <div class="content-section" id="section-exams">
+                    <div class="page-header">
+                        <h1>📝 Exam Schedule</h1>
+                        <p>Stay prepared with your upcoming examination schedule</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-body no-pad">
+                            <div style="overflow-x: auto;">
+                                <table class="data-table" id="exams-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Subject</th>
+                                            <th>Date</th>
+                                            <th>Time</th>
+                                            <th>Duration</th>
+                                            <th>Room</th>
+                                            <th>Type</th>
+                                            <th>Countdown</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="exams-tbody">
+                                        <tr><td colspan="7"><div class="loading-spinner"><div class="spinner"></div></div></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========== TIMETABLE ========== -->
+                <div class="content-section" id="section-timetable">
+                    <div class="page-header">
+                        <h1>🕐 Weekly Timetable</h1>
+                        <p>Your class schedule for the week</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-body" id="timetable-container">
+                            <div class="loading-spinner"><div class="spinner"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========== ASSIGNMENTS ========== -->
+                <div class="content-section" id="section-assignments">
+                    <div class="page-header">
+                        <h1>📋 Assignments</h1>
+                        <p>Track your pending and completed assignments</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-body no-pad">
+                            <div style="overflow-x: auto;">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Assignment</th>
+                                            <th>Course</th>
+                                            <th>Due Date</th>
+                                            <th>Max Marks</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="assignments-tbody">
+                                        <tr><td colspan="5"><div class="loading-spinner"><div class="spinner"></div></div></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========== ATTENDANCE ========== -->
+                <div class="content-section" id="section-attendance">
+                    <div class="page-header">
+                        <h1>✅ Attendance Record</h1>
+                        <p>Monitor your attendance across all courses</p>
+                    </div>
+                    <div class="attendance-summary" id="attendance-summary">
+                        <div class="loading-spinner"><div class="spinner"></div></div>
+                    </div>
+                </div>
+
+                <!-- ========== GRADES ========== -->
+                <div class="content-section" id="section-grades">
+                    <div class="page-header">
+                        <h1>📈 Academic Performance</h1>
+                        <p>View your grades and assessment results</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-body no-pad">
+                            <div style="overflow-x: auto;">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Course</th>
+                                            <th>Assessment</th>
+                                            <th>Type</th>
+                                            <th>Marks</th>
+                                            <th>Percentage</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="grades-tbody">
+                                        <tr><td colspan="5"><div class="loading-spinner"><div class="spinner"></div></div></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========== HOLIDAYS ========== -->
+                <div class="content-section" id="section-holidays">
+                    <div class="page-header">
+                        <h1>🏖️ Holiday Calendar</h1>
+                        <p>Upcoming holidays and vacation schedule</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-body no-pad">
+                            <div style="overflow-x: auto;">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Holiday</th>
+                                            <th>Date</th>
+                                            <th>Day</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="holidays-tbody">
+                                        <tr><td colspan="5"><div class="loading-spinner"><div class="spinner"></div></div></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========== ANNOUNCEMENTS ========== -->
+                <div class="content-section" id="section-announcements">
+                    <div class="page-header">
+                        <h1>📢 Announcements</h1>
+                        <p>Important notices and updates from the administration</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-body no-pad" id="announcements-list">
+                            <div class="loading-spinner"><div class="spinner"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========== AI CHATBOT ========== -->
+                <div class="content-section" id="section-chatbot">
+                    <div class="page-header">
+                        <h1>🤖 AI College Assistant</h1>
+                        <p>Ask me anything about your college, exams, events, and more!</p>
+                    </div>
+                    <div class="chat-container">
+                        <div class="chat-header">
+                            <div class="chat-avatar">🤖</div>
+                            <div class="chat-info">
+                                <h3>College AI Assistant</h3>
+                                <p>● Online - Ready to help</p>
+                            </div>
+                        </div>
+                        <div class="chat-messages" id="chat-messages">
+                            <div class="chat-message bot">
+                                <div class="chat-message-avatar">🤖</div>
+                                <div class="chat-bubble">
+                                    👋 Hello! I'm your Smart College Assistant. I can help you with exam schedules, events, holidays, assignments, grades, attendance, and more!<br><br>
+                                    Try asking me something like:<br>
+                                    • "When are my exams?"<br>
+                                    • "Show upcoming events"<br>
+                                    • "What holidays are coming up?"
+                                    <div class="timestamp">Just now</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-suggestions">
+                            <span class="chat-suggestion" onclick="sendChatMessage('When are my exams?')">📝 When are my exams?</span>
+                            <span class="chat-suggestion" onclick="sendChatMessage('Show upcoming events')">🎊 Upcoming events</span>
+                            <span class="chat-suggestion" onclick="sendChatMessage('What holidays are coming up?')">🏖️ Holidays</span>
+                            <span class="chat-suggestion" onclick="sendChatMessage('Show my assignments')">📋 Assignments</span>
+                            <span class="chat-suggestion" onclick="sendChatMessage('Tell me about placements')">💼 Placements</span>
+                            <span class="chat-suggestion" onclick="sendChatMessage('Help')">❓ Help</span>
+                        </div>
+                        <div class="chat-input-area">
+                            <input type="text" id="chat-input" placeholder="Type your message..." onkeypress="if(event.key==='Enter')sendChatMessage()">
+                            <button class="btn btn-primary" onclick="sendChatMessage()">Send ➤</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========== PROFILE ========== -->
+                <div class="content-section" id="section-profile">
+                    <div class="page-header">
+                        <h1>👤 My Profile</h1>
+                        <p>View and manage your profile information</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="profile-card" id="profile-content">
+                                <div class="loading-spinner"><div class="spinner"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        // ====== GLOBALS ======
+        const API_BASE = '';
+        let currentUser = null;
+        let authToken = null;
+        let allCalendarItems = [];
+        let allEvents = [];
+        let currentCalendarDate = new Date();
+
+        // ====== AUTH ======
+        function checkAuth() {
+            authToken = localStorage.getItem('token');
+            const userStr = localStorage.getItem('user');
+            if (!authToken || !userStr) {
+                window.location.href = '/';
+                return false;
+            }
+            currentUser = JSON.parse(userStr);
+            if (currentUser.role !== 'student') {
+                window.location.href = '/admin.html';
+                return false;
+            }
+            return true;
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/';
+        }
+
+        function apiHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            };
+        }
+
+        async function apiFetch(url, options = {}) {
+            options.headers = { ...apiHeaders(), ...options.headers };
+            const res = await fetch(`${API_BASE}${url}`, options);
+            if (res.status === 401 || res.status === 403) { logout(); return null; }
+            return res.json();
+        }
+
+        // ====== NAVIGATION ======
+        function navigateTo(section, navEl) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(`section-${section}`).classList.add('active');
+            if (navEl) navEl.classList.add('active');
+            closeSidebar();
+            loadSection(section);
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebar-overlay').classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebar-overlay').classList.remove('active');
+        }
+
+        // ====== TOAST ======
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <span class="toast-icon">${icons[type]}</span>
+                <span class="toast-message">${message}</span>
+                <button class="toast-close" onclick="this.parentElement.remove()">✕</button>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        // ====== DATE HELPERS ======
+        function formatDate(dateStr) {
+            const d = new Date(dateStr + 'T00:00:00');
+            return d.toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        function formatDay(dateStr) {
+            return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'long' });
+        }
+
+        function daysUntil(dateStr) {
+            const now = new Date(); now.setHours(0,0,0,0);
+            const target = new Date(dateStr + 'T00:00:00');
+            const diff = Math.ceil((target - now) / (1000 * 60 * 60 * 24));
+            if (diff === 0) return '<span class="badge badge-rose">Today</span>';
+            if (diff === 1) return '<span class="badge badge-amber">Tomorrow</span>';
+            if (diff < 0) return '<span class="badge badge-gray">Passed</span>';
+            return `<span class="badge badge-purple">${diff} days</span>`;
+        }
+
+        function getEventIcon(category) {
+            const icons = { cultural: '🎭', workshop: '🔧', seminar: '📚', sports: '⚽', placement: '💼', competition: '🏆', social: '❤️', general: '📌' };
+            return icons[category] || '📌';
+        }
+
+        // ====== LOAD SECTIONS ======
+        async function loadSection(section) {
+            switch(section) {
+                case 'dashboard': await loadDashboard(); break;
+                case 'calendar': await loadCalendar(); break;
+                case 'events': await loadEvents(); break;
+                case 'exams': await loadExams(); break;
+                case 'timetable': await loadTimetable(); break;
+                case 'assignments': await loadAssignments(); break;
+                case 'attendance': await loadAttendance(); break;
+                case 'grades': await loadGrades(); break;
+                case 'holidays': await loadHolidays(); break;
+                case 'announcements': await loadAnnouncements(); break;
+                case 'profile': await loadProfile(); break;
+            }
+        }
+
+        // ====== DASHBOARD ======
+        async function loadDashboard() {
+            const stats = await apiFetch('/api/student/dashboard');
+            if (!stats) return;
+
+            document.getElementById('dashboard-stats').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon rose">📝</div>
+                    </div>
+                    <div class="value">${stats.upcomingExams}</div>
+                    <div class="label">Upcoming Exams</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon amber">📋</div>
+                    </div>
+                    <div class="value">${stats.pendingAssignments}</div>
+                    <div class="label">Pending Assignments</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon purple">🎊</div>
+                    </div>
+                    <div class="value">${stats.upcomingEvents}</div>
+                    <div class="label">Upcoming Events</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon emerald">🏖️</div>
+                    </div>
+                    <div class="value">${stats.upcomingHolidays}</div>
+                    <div class="label">Upcoming Holidays</div>
+                </div>
+            `;
+
+            // Announcements
+            if (stats.recentAnnouncements && stats.recentAnnouncements.length > 0) {
+                document.getElementById('dashboard-announcements').innerHTML = stats.recentAnnouncements.map(a => `
+                    <div class="list-item">
+                        <div class="list-item-icon ${a.priority === 'urgent' ? 'rose' : a.priority === 'high' ? 'amber' : 'purple'}" 
+                             style="background: rgba(99,102,241,0.1);">📢</div>
+                        <div class="list-item-content">
+                            <h4>${a.title}</h4>
+                            <p>${a.content.substring(0, 80)}...</p>
+                        </div>
+                        <div class="list-item-meta">
+                            <span class="badge priority-${a.priority}">${a.priority}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('dashboard-announcements').innerHTML = '<div class="empty-state"><div class="icon">📢</div><h3>No announcements</h3></div>';
+            }
+
+            // Events
+            const events = await apiFetch('/api/events?upcoming=true&limit=4');
+            if (events && events.length > 0) {
+                document.getElementById('dashboard-events').innerHTML = events.map(e => `
+                    <div class="list-item">
+                        <div class="list-item-icon" style="background: rgba(99,102,241,0.1);">${getEventIcon(e.category)}</div>
+                        <div class="list-item-content">
+                            <h4>${e.title}</h4>
+                            <p>${e.location || 'TBA'} • ${formatDate(e.event_date)}</p>
+                        </div>
+                        <div class="list-item-meta">${daysUntil(e.event_date)}</div>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('dashboard-events').innerHTML = '<div class="empty-state"><div class="icon">🎊</div><h3>No upcoming events</h3></div>';
+            }
+
+            // Exams
+            const exams = await apiFetch('/api/exams?upcoming=true');
+            if (exams && exams.length > 0) {
+                document.getElementById('dashboard-exams').innerHTML = exams.slice(0, 4).map(e => `
+                    <div class="list-item">
+                        <div class="list-item-icon" style="background: rgba(244,63,94,0.1); color: var(--accent-rose);">📝</div>
+                        <div class="list-item-content">
+                            <h4>${e.subject}</h4>
+                            <p>${formatDate(e.exam_date)} at ${e.exam_time} • ${e.room}</p>
+                        </div>
+                        <div class="list-item-meta">${daysUntil(e.exam_date)}</div>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('dashboard-exams').innerHTML = '<div class="empty-state"><div class="icon">📝</div><h3>No upcoming exams</h3></div>';
+            }
+
+            // Assignments
+            const assignments = await apiFetch('/api/courses/assignments?upcoming=true');
+            if (assignments && assignments.length > 0) {
+                document.getElementById('dashboard-assignments').innerHTML = assignments.slice(0, 4).map(a => `
+                    <div class="list-item">
+                        <div class="list-item-icon" style="background: rgba(245,158,11,0.1); color: var(--accent-amber);">📋</div>
+                        <div class="list-item-content">
+                            <h4>${a.title}</h4>
+                            <p>${a.course_code} • Due: ${formatDate(a.due_date)}</p>
+                        </div>
+                        <div class="list-item-meta">${daysUntil(a.due_date)}</div>
+                    </div>
+                `).join('');
+                document.getElementById('assignment-badge').textContent = assignments.length;
+            } else {
+                document.getElementById('dashboard-assignments').innerHTML = '<div class="empty-state"><div class="icon">📋</div><h3>No pending assignments</h3></div>';
+            }
+        }
+
+        // ====== CALENDAR ======
+        async function loadCalendar() {
+            allCalendarItems = await apiFetch('/api/calendar') || [];
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const today = new Date();
+
+            let html = `
+                <div class="calendar-header">
+                    <button class="btn btn-icon btn-outline" onclick="changeMonth(-1)">◀</button>
+                    <h3>${monthNames[month]} ${year}</h3>
+                    <button class="btn btn-icon btn-outline" onclick="changeMonth(1)">▶</button>
+                </div>
+                <div class="calendar-grid">
+            `;
+
+            dayNames.forEach(d => { html += `<div class="calendar-day-name">${d}</div>`; });
+
+            // Empty cells before first day
+            for (let i = 0; i < firstDay; i++) {
+                html += '<div class="calendar-day other-month"></div>';
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === day;
+                const dayItems = allCalendarItems.filter(item => item.date === dateStr);
+
+                html += `<div class="calendar-day${isToday ? ' today' : ''}">`;
+                html += `<div class="day-number">${day}</div>`;
+                dayItems.slice(0, 3).forEach(item => {
+                    html += `<div class="calendar-event ${item.source}">${item.title}</div>`;
+                });
+                if (dayItems.length > 3) {
+                    html += `<div class="calendar-event" style="color: var(--text-muted);">+${dayItems.length - 3} more</div>`;
+                }
+                html += '</div>';
+            }
+
+            html += '</div>';
+            html += `
+                <div class="calendar-legend">
+                    <div class="legend-item"><div class="legend-dot event"></div> Events</div>
+                    <div class="legend-item"><div class="legend-dot holiday"></div> Holidays</div>
+                    <div class="legend-item"><div class="legend-dot exam"></div> Exams</div>
+                    <div class="legend-item"><div class="legend-dot assignment"></div> Assignments</div>
+                </div>
+            `;
+
+            document.getElementById('calendar-widget').innerHTML = html;
+        }
+
+        function changeMonth(delta) {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        // ====== EVENTS ======
+        async function loadEvents() {
+            allEvents = await apiFetch('/api/events') || [];
+            renderEvents(allEvents);
+        }
+
+        function renderEvents(events) {
+            if (events.length === 0) {
+                document.getElementById('events-grid').innerHTML = '<div class="empty-state"><div class="icon">🎊</div><h3>No events found</h3></div>';
+                return;
+            }
+
+            document.getElementById('events-grid').innerHTML = events.map(e => {
+                const d = new Date(e.event_date + 'T00:00:00');
+                const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                return `
+                <div class="event-card">
+                    <div class="event-card-banner ${e.category}">
+                        <div class="event-icon">${getEventIcon(e.category)}</div>
+                        ${e.is_featured ? '<span class="featured-badge">⭐ Featured</span>' : ''}
+                        <div class="event-date-badge">
+                            <div class="day">${d.getDate()}</div>
+                            <div class="month">${months[d.getMonth()]}</div>
+                        </div>
+                    </div>
+                    <div class="event-card-content">
+                        <h4>${e.title}</h4>
+                        <p>${e.description || ''}</p>
+                        <div class="event-meta">
+                            <span>📍 ${e.location || 'TBA'}</span>
+                            <span>🕐 ${e.event_time || 'TBA'}</span>
+                            <span>${daysUntil(e.event_date)}</span>
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function filterEvents(category, el) {
+            document.querySelectorAll('.toolbar .filter-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            if (category === 'all') {
+                renderEvents(allEvents);
+            } else {
+                renderEvents(allEvents.filter(e => e.category === category));
+            }
+        }
+
+        // ====== EXAMS ======
+        async function loadExams() {
+            const exams = await apiFetch('/api/exams') || [];
+            const tbody = document.getElementById('exams-tbody');
+            if (exams.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="icon">📝</div><h3>No exams scheduled</h3></div></td></tr>';
+                return;
+            }
+            tbody.innerHTML = exams.map(e => `
+                <tr>
+                    <td><strong>${e.subject}</strong></td>
+                    <td>${formatDate(e.exam_date)}</td>
+                    <td>${e.exam_time || 'TBA'}</td>
+                    <td>${e.duration_minutes} min</td>
+                    <td><span class="badge badge-purple">${e.room || 'TBA'}</span></td>
+                    <td><span class="badge badge-cyan">${e.exam_type}</span></td>
+                    <td>${daysUntil(e.exam_date)}</td>
+                </tr>
+            `).join('');
+        }
+
+        // ====== TIMETABLE ======
+        async function loadTimetable() {
+            const entries = await apiFetch(`/api/courses/timetable?department=${encodeURIComponent(currentUser.department)}&semester=${currentUser.semester}`) || [];
+            const container = document.getElementById('timetable-container');
+            
+            if (entries.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="icon">🕐</div><h3>No timetable available</h3><p>Timetable for your department and semester will appear here.</p></div>';
+                return;
+            }
+
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const timeSlots = ['08:00', '09:00', '10:00', '11:00', '12:00', '14:00', '15:00'];
+            const timeLabels = ['8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '2:00 PM', '3:00 PM'];
+
+            let html = '<div class="timetable-grid">';
+            html += '<div class="timetable-header">Time</div>';
+            days.forEach(d => { html += `<div class="timetable-header">${d.substring(0, 3)}</div>`; });
+
+            timeSlots.forEach((slot, i) => {
+                html += `<div class="timetable-time">${timeLabels[i]}</div>`;
+                days.forEach(day => {
+                    const classes = entries.filter(e => e.day_of_week === day && e.start_time <= slot && e.end_time > slot);
+                    html += '<div class="timetable-cell">';
+                    classes.forEach(c => {
+                        html += `<div class="timetable-class">
+                            <div class="subject">${c.course_code}</div>
+                            <div class="room">${c.room} • ${c.instructor}</div>
+                        </div>`;
+                    });
+                    html += '</div>';
+                });
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // ====== ASSIGNMENTS ======
+        async function loadAssignments() {
+            const assignments = await apiFetch('/api/courses/assignments') || [];
+            const tbody = document.getElementById('assignments-tbody');
+            if (assignments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="icon">📋</div><h3>No assignments</h3></div></td></tr>';
+                return;
+            }
+            const today = new Date(); today.setHours(0,0,0,0);
+            tbody.innerHTML = assignments.map(a => {
+                const due = new Date(a.due_date + 'T00:00:00');
+                const isPast = due < today;
+                return `
+                <tr>
+                    <td>
+                        <strong>${a.title}</strong>
+                        ${a.description ? `<br><span style="font-size:0.8rem;color:var(--text-muted)">${a.description.substring(0, 60)}...</span>` : ''}
+                    </td>
+                    <td><span class="badge badge-purple">${a.course_code}</span></td>
+                    <td>${formatDate(a.due_date)}</td>
+                    <td>${a.max_marks}</td>
+                    <td>${isPast ? '<span class="badge badge-gray">Ended</span>' : daysUntil(a.due_date)}</td>
+                </tr>
+            `}).join('');
+        }
+
+        // ====== ATTENDANCE ======
+        async function loadAttendance() {
+            const summary = await apiFetch('/api/courses/attendance/summary') || [];
+            const container = document.getElementById('attendance-summary');
+            if (summary.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="icon">✅</div><h3>No attendance data</h3><p>Attendance records will appear here once classes begin.</p></div>';
+                return;
+            }
+            container.innerHTML = summary.map(s => {
+                const cls = s.percentage >= 75 ? 'good' : s.percentage >= 60 ? 'warning' : 'danger';
+                return `
+                <div class="attendance-card">
+                    <div class="attendance-card-header">
+                        <div>
+                            <h4>${s.name}</h4>
+                            <span style="font-size:0.8rem;color:var(--text-muted)">${s.code}</span>
+                        </div>
+                        <div class="attendance-percentage ${cls}">${s.percentage}%</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill ${cls}" style="width: ${s.percentage}%"></div>
+                    </div>
+                    <div class="attendance-stats">
+                        <span>✅ Present: ${s.present}</span>
+                        <span>❌ Absent: ${s.absent}</span>
+                        <span>⏰ Late: ${s.late}</span>
+                        <span>📊 Total: ${s.total_classes}</span>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        // ====== GRADES ======
+        async function loadGrades() {
+            const grades = await apiFetch('/api/courses/grades') || [];
+            const tbody = document.getElementById('grades-tbody');
+            if (grades.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="icon">📈</div><h3>No grades available</h3></div></td></tr>';
+                return;
+            }
+            tbody.innerHTML = grades.map(g => {
+                const pct = ((g.marks_obtained / g.max_marks) * 100).toFixed(1);
+                const cls = pct >= 80 ? 'emerald' : pct >= 60 ? 'amber' : 'rose';
+                return `
+                <tr>
+                    <td><strong>${g.course_code}</strong> - ${g.course_name}</td>
+                    <td>${g.assignment_title}</td>
+                    <td><span class="badge badge-purple">${g.grade_type}</span></td>
+                    <td>${g.marks_obtained} / ${g.max_marks}</td>
+                    <td><span class="badge badge-${cls}">${pct}%</span></td>
+                </tr>
+            `}).join('');
+        }
+
+        // ====== HOLIDAYS ======
+        async function loadHolidays() {
+            const holidays = await apiFetch('/api/holidays') || [];
+            const tbody = document.getElementById('holidays-tbody');
+            if (holidays.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="icon">🏖️</div><h3>No holidays listed</h3></div></td></tr>';
+                return;
+            }
+            const typeBadge = { national: 'badge-rose', festival: 'badge-amber', religious: 'badge-purple', public: 'badge-cyan', vacation: 'badge-emerald' };
+            tbody.innerHTML = holidays.map(h => `
+                <tr>
+                    <td><strong>${h.title}</strong></td>
+                    <td>${formatDate(h.holiday_date)}</td>
+                    <td>${formatDay(h.holiday_date)}</td>
+                    <td><span class="badge ${typeBadge[h.type] || 'badge-gray'}">${h.type}</span></td>
+                    <td style="color: var(--text-secondary)">${h.description || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        // ====== ANNOUNCEMENTS ======
+        async function loadAnnouncements() {
+            const announcements = await apiFetch('/api/announcements') || [];
+            const container = document.getElementById('announcements-list');
+            if (announcements.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="icon">📢</div><h3>No announcements</h3></div>';
+                return;
+            }
+            container.innerHTML = announcements.map(a => `
+                <div class="announcement-item">
+                    <div class="announcement-header">
+                        ${a.is_pinned ? '<span class="pin-icon">📌</span>' : ''}
+                        <h4>${a.title}</h4>
+                        <span class="badge priority-${a.priority}">${a.priority}</span>
+                    </div>
+                    <div class="announcement-content">${a.content}</div>
+                    <div class="announcement-footer">
+                        <span>👤 ${a.author || 'Admin'}</span>
+                        <span>📅 ${new Date(a.created_at).toLocaleDateString('en-IN')}</span>
+                        ${a.expires_at ? `<span>⏰ Expires: ${formatDate(a.expires_at)}</span>` : ''}
+                        ${a.department ? `<span>🏢 ${a.department}</span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ====== AI CHATBOT ======
+        async function sendChatMessage(text) {
+            const input = document.getElementById('chat-input');
+            const message = text || input.value.trim();
+            if (!message) return;
+            input.value = '';
+
+            const chatBox = document.getElementById('chat-messages');
+            const time = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
+            // Add user message
+            chatBox.innerHTML += `
+                <div class="chat-message user">
+                    <div class="chat-message-avatar">👤</div>
+                    <div class="chat-bubble">${message}<div class="timestamp">${time}</div></div>
+                </div>
+            `;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Show typing
+            const typingId = 'typing-' + Date.now();
+            chatBox.innerHTML += `<div class="chat-message bot" id="${typingId}">
+                <div class="chat-message-avatar">🤖</div>
+                <div class="chat-bubble"><em>Thinking...</em></div>
+            </div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const data = await apiFetch('/api/chat', {
+                    method: 'POST',
+                    body: JSON.stringify({ message })
+                });
+
+                document.getElementById(typingId).remove();
+
+                if (data && data.response) {
+                    const formattedResponse = data.response
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\n/g, '<br>');
+
+                    chatBox.innerHTML += `
+                        <div class="chat-message bot">
+                            <div class="chat-message-avatar">🤖</div>
+                            <div class="chat-bubble">${formattedResponse}<div class="timestamp">${time}</div></div>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                document.getElementById(typingId).remove();
+                chatBox.innerHTML += `
+                    <div class="chat-message bot">
+                        <div class="chat-message-avatar">🤖</div>
+                        <div class="chat-bubble">Sorry, I encountered an error. Please try again.<div class="timestamp">${time}</div></div>
+                    </div>
+                `;
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // ====== PROFILE ======
+        async function loadProfile() {
+            const user = await apiFetch('/api/auth/profile');
+            if (!user) return;
+            const initials = user.full_name.split(' ').map(n => n[0]).join('').substring(0, 2);
+            document.getElementById('profile-content').innerHTML = `
+                <div class="profile-avatar-section">
+                    <div class="profile-avatar-large">${initials}</div>
+                    <h3>${user.full_name}</h3>
+                    <span class="badge badge-purple" style="margin-top:8px">Student</span>
+                </div>
+                <div class="profile-details">
+                    <div class="profile-info-grid">
+                        <div class="profile-field">
+                            <label>Username</label>
+                            <div class="value">${user.username}</div>
+                        </div>
+                        <div class="profile-field">
+                            <label>Email</label>
+                            <div class="value">${user.email}</div>
+                        </div>
+                        <div class="profile-field">
+                            <label>Phone</label>
+                            <div class="value">${user.phone || 'Not set'}</div>
+                        </div>
+                        <div class="profile-field">
+                            <label>Department</label>
+                            <div class="value">${user.department}</div>
+                        </div>
+                        <div class="profile-field">
+                            <label>Semester</label>
+                            <div class="value">${user.semester || '-'}</div>
+                        </div>
+                        <div class="profile-field">
+                            <label>Enrollment No.</label>
+                            <div class="value">${user.enrollment_no || '-'}</div>
+                        </div>
+                        <div class="profile-field">
+                            <label>Member Since</label>
+                            <div class="value">${new Date(user.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ====== INIT ======
+        window.addEventListener('load', () => {
+            if (!checkAuth()) return;
+
+            // Set user info
+            document.getElementById('welcome-name').textContent = currentUser.full_name.split(' ')[0];
+            const initials = currentUser.full_name.split(' ').map(n => n[0]).join('').substring(0, 2);
+            document.getElementById('sidebar-avatar').textContent = initials;
+            document.getElementById('sidebar-name').textContent = currentUser.full_name;
+
+            // Set date
+            const now = new Date();
+            document.getElementById('topbar-date').innerHTML = `📅 ${now.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`;
+
+            // Load dashboard
+            loadDashboard();
+
+            // Check notifications
+            apiFetch('/api/courses/notifications').then(notifs => {
+                if (notifs) {
+                    const unread = notifs.filter(n => !n.is_read).length;
+                    if (unread > 0) {
+                        document.getElementById('notif-dot').style.display = 'block';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

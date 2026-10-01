@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Smart College Assistant - Admin Dashboard. Manage events, exams, holidays, students and more.">
+    <title>Admin Dashboard | Smart College Assistant</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="dashboard">
+        <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">⚙️</div>
+                <div class="sidebar-brand">
+                    <h2>College Assistant</h2>
+                    <span>Admin Panel</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Overview</div>
+                <div class="nav-item active" onclick="navigateTo('dashboard', this)"><span class="icon">📊</span><span>Dashboard</span></div>
+
+                <div class="nav-section-title">Content Management</div>
+                <div class="nav-item" onclick="navigateTo('events', this)"><span class="icon">🎊</span><span>Events</span></div>
+                <div class="nav-item" onclick="navigateTo('exams', this)"><span class="icon">📝</span><span>Exams</span></div>
+                <div class="nav-item" onclick="navigateTo('holidays', this)"><span class="icon">🏖️</span><span>Holidays</span></div>
+                <div class="nav-item" onclick="navigateTo('announcements', this)"><span class="icon">📢</span><span>Announcements</span></div>
+                <div class="nav-item" onclick="navigateTo('courses', this)"><span class="icon">📚</span><span>Courses</span></div>
+                <div class="nav-item" onclick="navigateTo('assignments', this)"><span class="icon">📋</span><span>Assignments</span></div>
+
+                <div class="nav-section-title">User Management</div>
+                <div class="nav-item" onclick="navigateTo('students', this)"><span class="icon">🎒</span><span>Students</span></div>
+
+                <div class="nav-section-title">Tools</div>
+                <div class="nav-item" onclick="navigateTo('calendar', this)"><span class="icon">📅</span><span>Calendar</span></div>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="sidebar-user-avatar" id="sidebar-avatar">A</div>
+                    <div class="sidebar-user-info">
+                        <div class="name" id="sidebar-name">Admin</div>
+                        <div class="role">Administrator</div>
+                    </div>
+                </div>
+                <div class="nav-item" onclick="logout()" style="margin-top: 8px; color: var(--accent-rose);">
+                    <span class="icon">🚪</span><span>Logout</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="topbar-toggle" onclick="toggleSidebar()">☰</button>
+                    <div class="topbar-search">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" placeholder="Search..." id="global-search">
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <div class="topbar-date" id="topbar-date"></div>
+                    <button class="topbar-btn" onclick="window.location.href='/'">🏠</button>
+                </div>
+            </header>
+
+            <div class="page-content">
+
+                <!-- DASHBOARD -->
+                <div class="content-section active" id="section-dashboard">
+                    <div class="page-header">
+                        <h1>Admin Dashboard</h1>
+                        <p>Overview of your college management system</p>
+                    </div>
+                    <div class="stats-grid" id="admin-stats"></div>
+                    <div class="content-grid-2">
+                        <div class="card">
+                            <div class="card-header"><h3>📊 Department Distribution</h3></div>
+                            <div class="card-body" id="dept-chart"></div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header"><h3>🕐 Recent Activity</h3></div>
+                            <div class="card-body no-pad" id="recent-activity"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EVENTS -->
+                <div class="content-section" id="section-events">
+                    <div class="page-header">
+                        <h1>🎊 Manage Events</h1>
+                        <p>Create and manage campus events</p>
+                    </div>
+                    <div class="toolbar">
+                        <div class="toolbar-left"><h3 id="events-count"></h3></div>
+                        <div class="toolbar-right">
+                            <button class="btn btn-primary" onclick="openModal('event')">+ Add Event</button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body no-pad">
+                            <div style="overflow-x:auto">
+                                <table class="data-table"><thead><tr>
+                                    <th>Title</th><th>Date</th><th>Location</th><th>Category</th><th>Featured</th><th>Actions</th>
+                                </tr></thead><tbody id="admin-events-tbody"></tbody></table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EXAMS -->
+                <div class="content-section" id="section-exams">
+                    <div class="page-header">
+                        <h1>📝 Manage Exams</h1>
+                        <p>Schedule and manage examinations</p>
+                    </div>
+                    <div class="toolbar">
+                        <div class="toolbar-left"><h3 id="exams-count"></h3></div>
+                        <div class="toolbar-right">
+                            <button class="btn btn-primary" onclick="openModal('exam')">+ Schedule Exam</button>
+                        </div>
+                    </div>
+                    <div class="card"><div class="card-body no-pad"><div style="overflow-x:auto">
+                        <table class="data-table"><thead><tr>
+                            <th>Subject</th><th>Date</th><th>Time</th><th>Duration</th><th>Room</th><th>Department</th><th>Sem</th><th>Actions</th>
+                        </tr></thead><tbody id="admin-exams-tbody"></tbody></table>
+                    </div></div></div>
+                </div>
+
+                <!-- HOLIDAYS -->
+                <div class="content-section" id="section-holidays">
+                    <div class="page-header">
+                        <h1>🏖️ Manage Holidays</h1>
+                        <p>Add and manage academic holidays</p>
+                    </div>
+                    <div class="toolbar">
+                        <div class="toolbar-left"><h3 id="holidays-count"></h3></div>
+                        <div class="toolbar-right">
+                            <button class="btn btn-primary" onclick="openModal('holiday')">+ Add Holiday</button>
+                        </div>
+                    </div>
+                    <div class="card"><div class="card-body no-pad"><div style="overflow-x:auto">
+                        <table class="data-table"><thead><tr>
+                            <th>Title</th><th>Date</th><th>Type</th><th>Description</th><th>Actions</th>
+                        </tr></thead><tbody id="admin-holidays-tbody"></tbody></table>
+                    </div></div></div>
+                </div>
+
+                <!-- ANNOUNCEMENTS -->
+                <div class="content-section" id="section-announcements">
+                    <div class="page-header">
+                        <h1>📢 Manage Announcements</h1>
+                        <p>Create and manage announcements</p>
+                    </div>
+                    <div class="toolbar">
+                        <div class="toolbar-left"><h3 id="announcements-count"></h3></div>
+                        <div class="toolbar-right">
+                            <button class="btn btn-primary" onclick="openModal('announcement')">+ New Announcement</button>
+                        </div>
+                    </div>
+                    <div class="card"><div class="card-body no-pad"><div style="overflow-x:auto">
+                        <table class="data-table"><thead><tr>
+                            <th>Title</th><th>Priority</th><th>Pinned</th><th>Department</th><th>Created</th><th>Actions</th>
+                        </tr></thead><tbody id="admin-announcements-tbody"></tbody></table>
+                    </div></div></div>
+                </div>
+
+                <!-- COURSES -->
+                <div class="content-section" id="section-courses">
+                    <div class="page-header">
+                        <h1>📚 Manage Courses</h1>
+                        <p>Add and manage courses</p>
+                    </div>
+                    <div class="toolbar">
+                        <div class="toolbar-left"><h3 id="courses-count"></h3></div>
+                        <div class="toolbar-right">
+                            <button class="btn btn-primary" onclick="openModal('course')">+ Add Course</button>
+                        </div>
+                    </div>
+                    <div class="card"><div class="card-body no-pad"><div style="overflow-x:auto">
+                        <table class="data-table"><thead><tr>
+                            <th>Code</th><th>Name</th><th>Department</th><th>Sem</th><th>Credits</th><th>Instructor</th><th>Actions</th>
+                        </tr></thead><tbody id="admin-courses-tbody"></tbody></table>
+                    </div></div></div>
+                </div>
+
+                <!-- ASSIGNMENTS -->
+                <div class="content-section" id="section-assignments">
+                    <div class="page-header">
+                        <h1>📋 Manage Assignments</h1>
+                        <p>Create and manage assignments</p>
+                    </div>
+                    <div class="toolbar">
+                        <div class="toolbar-left"><h3 id="assignments-count"></h3></div>
+                        <div class="toolbar-right">
+                            <button class="btn btn-primary" onclick="openModal('assignment')">+ Create Assignment</button>
+                        </div>
+                    </div>
+                    <div class="card"><div class="card-body no-pad"><div style="overflow-x:auto">
+                        <table class="data-table"><thead><tr>
+                            <th>Title</th><th>Course</th><th>Due Date</th><th>Max Marks</th><th>Actions</th>
+                        </tr></thead><tbody id="admin-assignments-tbody"></tbody></table>
+                    </div></div></div>
+                </div>
+
+                <!-- STUDENTS -->
+                <div class="content-section" id="section-students">
+                    <div class="page-header">
+                        <h1>🎒 Manage Students</h1>
+                        <p>View and manage student records</p>
+                    </div>
+                    <div class="toolbar">
+                        <div class="toolbar-left">
+                            <h3 id="students-count"></h3>
+                            <select class="filter-select" id="student-dept-filter" onchange="loadStudents()">
+                                <option value="">All Departments</option>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Electronics">Electronics</option>
+                                <option value="Mechanical">Mechanical</option>
+                                <option value="Civil">Civil</option>
+                                <option value="Electrical">Electrical</option>
+                            </select>
+                        </div>
+                        <div class="toolbar-right">
+                            <button class="btn btn-primary" onclick="openModal('student')">+ Add Student</button>
+                        </div>
+                    </div>
+                    <div class="card"><div class="card-body no-pad"><div style="overflow-x:auto">
+                        <table class="data-table"><thead><tr>
+                            <th>Name</th><th>Username</th><th>Email</th><th>Department</th><th>Sem</th><th>Enrollment</th><th>Actions</th>
+                        </tr></thead><tbody id="admin-students-tbody"></tbody></table>
+                    </div></div></div>
+                </div>
+
+                <!-- CALENDAR -->
+                <div class="content-section" id="section-calendar">
+                    <div class="page-header">
+                        <h1>📅 Academic Calendar</h1>
+                        <p>Complete view of all academic activities</p>
+                    </div>
+                    <div class="calendar-container" id="calendar-widget">
+                        <div class="loading-spinner"><div class="spinner"></div></div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Add New</h3>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" id="modal-submit" onclick="submitModal()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        const API_BASE = '';
+        let currentUser = null;
+        let authToken = null;
+        let currentModalType = '';
+        let currentEditId = null;
+        let allCalendarItems = [];
+        let currentCalendarDate = new Date();
+        let allCourses = [];
+
+        function checkAuth() {
+            authToken = localStorage.getItem('token');
+            const userStr = localStorage.getItem('user');
+            if (!authToken || !userStr) { window.location.href = '/'; return false; }
+            currentUser = JSON.parse(userStr);
+            if (currentUser.role !== 'admin') { window.location.href = '/student.html'; return false; }
+            return true;
+        }
+
+        function logout() { localStorage.clear(); window.location.href = '/'; }
+        function apiHeaders() { return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` }; }
+        async function apiFetch(url, options = {}) {
+            options.headers = { ...apiHeaders(), ...options.headers };
+            const res = await fetch(`${API_BASE}${url}`, options);
+            if (res.status === 401 || res.status === 403) { logout(); return null; }
+            return res.json();
+        }
+
+        function navigateTo(section, navEl) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(`section-${section}`).classList.add('active');
+            if (navEl) navEl.classList.add('active');
+            closeSidebar();
+            loadSection(section);
+        }
+
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebar-overlay').classList.toggle('active'); }
+        function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').classList.remove('active'); }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span class="toast-icon">${icons[type]}</span><span class="toast-message">${message}</span><button class="toast-close" onclick="this.parentElement.remove()">✕</button>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        function formatDate(d) { return new Date(d + 'T00:00:00').toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' }); }
+
+        async function loadSection(section) {
+            switch(section) {
+                case 'dashboard': await loadAdminDashboard(); break;
+                case 'events': await loadAdminEvents(); break;
+                case 'exams': await loadAdminExams(); break;
+                case 'holidays': await loadAdminHolidays(); break;
+                case 'announcements': await loadAdminAnnouncements(); break;
+                case 'courses': await loadAdminCourses(); break;
+                case 'assignments': await loadAdminAssignments(); break;
+                case 'students': await loadStudents(); break;
+                case 'calendar': await loadCalendar(); break;
+            }
+        }
+
+        // ====== ADMIN DASHBOARD ======
+        async function loadAdminDashboard() {
+            const stats = await apiFetch('/api/admin/dashboard');
+            if (!stats) return;
+
+            document.getElementById('admin-stats').innerHTML = `
+                <div class="stat-card"><div class="stat-card-header"><div class="stat-card-icon purple">🎒</div></div><div class="value">${stats.totalStudents}</div><div class="label">Total Students</div></div>
+                <div class="stat-card"><div class="stat-card-header"><div class="stat-card-icon cyan">📚</div></div><div class="value">${stats.totalCourses}</div><div class="label">Total Courses</div></div>
+                <div class="stat-card"><div class="stat-card-header"><div class="stat-card-icon emerald">🎊</div></div><div class="value">${stats.upcomingEvents}</div><div class="label">Upcoming Events</div></div>
+                <div class="stat-card"><div class="stat-card-header"><div class="stat-card-icon rose">📝</div></div><div class="value">${stats.upcomingExams}</div><div class="label">Upcoming Exams</div></div>
+                <div class="stat-card"><div class="stat-card-header"><div class="stat-card-icon amber">📢</div></div><div class="value">${stats.totalAnnouncements}</div><div class="label">Announcements</div></div>
+                <div class="stat-card"><div class="stat-card-header"><div class="stat-card-icon orange">🏖️</div></div><div class="value">${stats.totalHolidays}</div><div class="label">Holidays</div></div>
+            `;
+
+            // Department chart
+            if (stats.departmentWise) {
+                const maxCount = Math.max(...stats.departmentWise.map(d => d.count), 1);
+                const colors = ['var(--primary)', 'var(--accent-cyan)', 'var(--accent-emerald)', 'var(--accent-amber)', 'var(--accent-rose)'];
+                document.getElementById('dept-chart').innerHTML = stats.departmentWise.map((d, i) => `
+                    <div style="margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.85rem;">
+                            <span>${d.department}</span><span style="color: var(--text-muted)">${d.count} students</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${(d.count/maxCount)*100}%; background: ${colors[i % colors.length]}; border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Recent activity
+            if (stats.recentActivity) {
+                const icons = { event: '🎊', announcement: '📢', exam: '📝' };
+                document.getElementById('recent-activity').innerHTML = stats.recentActivity.map(a => `
+                    <div class="list-item">
+                        <div class="list-item-icon" style="background: rgba(99,102,241,0.1);">${icons[a.type] || '📌'}</div>
+                        <div class="list-item-content"><h4>${a.title}</h4><p>${a.type}</p></div>
+                        <div class="list-item-meta"><span class="date">${new Date(a.created_at).toLocaleDateString()}</span></div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // ====== ADMIN EVENTS ======
+        async function loadAdminEvents() {
+            const events = await apiFetch('/api/events') || [];
+            document.getElementById('events-count').textContent = `${events.length} Events`;
+            document.getElementById('admin-events-tbody').innerHTML = events.map(e => `
+                <tr>
+                    <td><strong>${e.title}</strong></td>
+                    <td>${formatDate(e.event_date)}</td>
+                    <td>${e.location || '-'}</td>
+                    <td><span class="badge badge-purple">${e.category}</span></td>
+                    <td>${e.is_featured ? '⭐' : '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline" onclick="editItem('event', ${e.id})">✏️</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteItem('events', ${e.id})">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ====== ADMIN EXAMS ======
+        async function loadAdminExams() {
+            const exams = await apiFetch('/api/exams') || [];
+            document.getElementById('exams-count').textContent = `${exams.length} Exams`;
+            document.getElementById('admin-exams-tbody').innerHTML = exams.map(e => `
+                <tr>
+                    <td><strong>${e.subject}</strong></td>
+                    <td>${formatDate(e.exam_date)}</td>
+                    <td>${e.exam_time || '-'}</td>
+                    <td>${e.duration_minutes} min</td>
+                    <td>${e.room || '-'}</td>
+                    <td><span class="badge badge-cyan">${e.department}</span></td>
+                    <td>${e.semester}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline" onclick="editItem('exam', ${e.id})">✏️</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteItem('exams', ${e.id})">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ====== ADMIN HOLIDAYS ======
+        async function loadAdminHolidays() {
+            const holidays = await apiFetch('/api/holidays') || [];
+            document.getElementById('holidays-count').textContent = `${holidays.length} Holidays`;
+            const typeBadge = { national: 'badge-rose', festival: 'badge-amber', religious: 'badge-purple', public: 'badge-cyan', vacation: 'badge-emerald' };
+            document.getElementById('admin-holidays-tbody').innerHTML = holidays.map(h => `
+                <tr>
+                    <td><strong>${h.title}</strong></td>
+                    <td>${formatDate(h.holiday_date)}</td>
+                    <td><span class="badge ${typeBadge[h.type] || 'badge-gray'}">${h.type}</span></td>
+                    <td style="color:var(--text-secondary)">${h.description || '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline" onclick="editItem('holiday', ${h.id})">✏️</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteItem('holidays', ${h.id})">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ====== ADMIN ANNOUNCEMENTS ======
+        async function loadAdminAnnouncements() {
+            const announcements = await apiFetch('/api/announcements') || [];
+            document.getElementById('announcements-count').textContent = `${announcements.length} Announcements`;
+            document.getElementById('admin-announcements-tbody').innerHTML = announcements.map(a => `
+                <tr>
+                    <td><strong>${a.title}</strong></td>
+                    <td><span class="badge priority-${a.priority}">${a.priority}</span></td>
+                    <td>${a.is_pinned ? '📌 Yes' : '-'}</td>
+                    <td>${a.department || 'All'}</td>
+                    <td>${new Date(a.created_at).toLocaleDateString()}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline" onclick="editItem('announcement', ${a.id})">✏️</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteItem('announcements', ${a.id})">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ====== ADMIN COURSES ======
+        async function loadAdminCourses() {
+            const courses = await apiFetch('/api/courses') || [];
+            allCourses = courses;
+            document.getElementById('courses-count').textContent = `${courses.length} Courses`;
+            document.getElementById('admin-courses-tbody').innerHTML = courses.map(c => `
+                <tr>
+                    <td><strong>${c.code}</strong></td>
+                    <td>${c.name}</td>
+                    <td><span class="badge badge-cyan">${c.department}</span></td>
+                    <td>${c.semester || '-'}</td>
+                    <td>${c.credits}</td>
+                    <td>${c.instructor || '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline" onclick="editItem('course', ${c.id})">✏️</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteItem('courses', ${c.id})">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ====== ADMIN ASSIGNMENTS ======
+        async function loadAdminAssignments() {
+            const assignments = await apiFetch('/api/courses/assignments') || [];
+            document.getElementById('assignments-count').textContent = `${assignments.length} Assignments`;
+            document.getElementById('admin-assignments-tbody').innerHTML = assignments.map(a => `
+                <tr>
+                    <td><strong>${a.title}</strong></td>
+                    <td><span class="badge badge-purple">${a.course_code || '-'}</span></td>
+                    <td>${formatDate(a.due_date)}</td>
+                    <td>${a.max_marks}</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="deleteItem('courses/assignments', ${a.id})">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ====== STUDENTS ======
+        async function loadStudents() {
+            const dept = document.getElementById('student-dept-filter').value;
+            const url = dept ? `/api/admin/students?department=${encodeURIComponent(dept)}` : '/api/admin/students';
+            const students = await apiFetch(url) || [];
+            document.getElementById('students-count').textContent = `${students.length} Students`;
+            document.getElementById('admin-students-tbody').innerHTML = students.map(s => `
+                <tr>
+                    <td><strong>${s.full_name}</strong></td>
+                    <td>${s.username}</td>
+                    <td>${s.email}</td>
+                    <td><span class="badge badge-cyan">${s.department}</span></td>
+                    <td>${s.semester || '-'}</td>
+                    <td>${s.enrollment_no || '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="deleteItem('admin/students', ${s.id})">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ====== CALENDAR ======
+        async function loadCalendar() {
+            allCalendarItems = await apiFetch('/api/calendar') || [];
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+            const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+            const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const today = new Date();
+
+            let html = `<div class="calendar-header">
+                <button class="btn btn-icon btn-outline" onclick="changeMonth(-1)">◀</button>
+                <h3>${monthNames[month]} ${year}</h3>
+                <button class="btn btn-icon btn-outline" onclick="changeMonth(1)">▶</button>
+            </div><div class="calendar-grid">`;
+
+            dayNames.forEach(d => { html += `<div class="calendar-day-name">${d}</div>`; });
+            for (let i = 0; i < firstDay; i++) html += '<div class="calendar-day other-month"></div>';
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                const isToday = today.getFullYear()===year && today.getMonth()===month && today.getDate()===day;
+                const dayItems = allCalendarItems.filter(i => i.date === dateStr);
+                html += `<div class="calendar-day${isToday?' today':''}"><div class="day-number">${day}</div>`;
+                dayItems.slice(0,3).forEach(i => { html += `<div class="calendar-event ${i.source}">${i.title}</div>`; });
+                if (dayItems.length > 3) html += `<div class="calendar-event" style="color:var(--text-muted)">+${dayItems.length-3} more</div>`;
+                html += '</div>';
+            }
+            html += '</div><div class="calendar-legend"><div class="legend-item"><div class="legend-dot event"></div> Events</div><div class="legend-item"><div class="legend-dot holiday"></div> Holidays</div><div class="legend-item"><div class="legend-dot exam"></div> Exams</div><div class="legend-item"><div class="legend-dot assignment"></div> Assignments</div></div>';
+            document.getElementById('calendar-widget').innerHTML = html;
+        }
+
+        function changeMonth(d) { currentCalendarDate.setMonth(currentCalendarDate.getMonth()+d); renderCalendar(); }
+
+        // ====== MODAL ======
+        function openModal(type, data = null) {
+            currentModalType = type;
+            currentEditId = data ? data.id : null;
+            const title = data ? `Edit ${type.charAt(0).toUpperCase()+type.slice(1)}` : `Add ${type.charAt(0).toUpperCase()+type.slice(1)}`;
+            document.getElementById('modal-title').textContent = title;
+
+            let html = '';
+            switch(type) {
+                case 'event':
+                    html = `<div class="form-grid">
+                        <div class="form-group full-width"><label>Title</label><input class="form-input" id="f-title" value="${data?.title||''}" required></div>
+                        <div class="form-group full-width"><label>Description</label><textarea class="form-textarea" id="f-description">${data?.description||''}</textarea></div>
+                        <div class="form-group"><label>Start Date</label><input type="date" class="form-input" id="f-event_date" value="${data?.event_date||''}"></div>
+                        <div class="form-group"><label>End Date</label><input type="date" class="form-input" id="f-end_date" value="${data?.end_date||''}"></div>
+                        <div class="form-group"><label>Time</label><input type="time" class="form-input" id="f-event_time" value="${data?.event_time||''}"></div>
+                        <div class="form-group"><label>Location</label><input class="form-input" id="f-location" value="${data?.location||''}"></div>
+                        <div class="form-group"><label>Category</label><select class="form-select" id="f-category">
+                            <option value="general" ${data?.category==='general'?'selected':''}>General</option>
+                            <option value="cultural" ${data?.category==='cultural'?'selected':''}>Cultural</option>
+                            <option value="workshop" ${data?.category==='workshop'?'selected':''}>Workshop</option>
+                            <option value="seminar" ${data?.category==='seminar'?'selected':''}>Seminar</option>
+                            <option value="sports" ${data?.category==='sports'?'selected':''}>Sports</option>
+                            <option value="placement" ${data?.category==='placement'?'selected':''}>Placement</option>
+                            <option value="competition" ${data?.category==='competition'?'selected':''}>Competition</option>
+                            <option value="social" ${data?.category==='social'?'selected':''}>Social</option>
+                        </select></div>
+                        <div class="form-group"><label>Featured</label><select class="form-select" id="f-is_featured"><option value="0">No</option><option value="1" ${data?.is_featured?'selected':''}>Yes</option></select></div>
+                    </div>`; break;
+                case 'exam':
+                    html = `<div class="form-grid">
+                        <div class="form-group full-width"><label>Subject</label><input class="form-input" id="f-subject" value="${data?.subject||''}"></div>
+                        <div class="form-group"><label>Date</label><input type="date" class="form-input" id="f-exam_date" value="${data?.exam_date||''}"></div>
+                        <div class="form-group"><label>Time</label><input type="time" class="form-input" id="f-exam_time" value="${data?.exam_time||''}"></div>
+                        <div class="form-group"><label>Duration (min)</label><input type="number" class="form-input" id="f-duration_minutes" value="${data?.duration_minutes||180}"></div>
+                        <div class="form-group"><label>Room</label><input class="form-input" id="f-room" value="${data?.room||''}"></div>
+                        <div class="form-group"><label>Department</label><select class="form-select" id="f-department">
+                            <option value="Computer Science">Computer Science</option><option value="Electronics">Electronics</option><option value="Mechanical">Mechanical</option><option value="Civil">Civil</option><option value="Electrical">Electrical</option>
+                        </select></div>
+                        <div class="form-group"><label>Semester</label><input type="number" class="form-input" id="f-semester" min="1" max="8" value="${data?.semester||3}"></div>
+                        <div class="form-group"><label>Type</label><select class="form-select" id="f-exam_type">
+                            <option value="mid-semester">Mid-Semester</option><option value="end-semester">End-Semester</option><option value="regular">Regular</option><option value="supplementary">Supplementary</option>
+                        </select></div>
+                        <div class="form-group full-width"><label>Syllabus</label><textarea class="form-textarea" id="f-syllabus">${data?.syllabus||''}</textarea></div>
+                    </div>`; break;
+                case 'holiday':
+                    html = `<div class="form-grid">
+                        <div class="form-group full-width"><label>Title</label><input class="form-input" id="f-title" value="${data?.title||''}"></div>
+                        <div class="form-group"><label>Date</label><input type="date" class="form-input" id="f-holiday_date" value="${data?.holiday_date||''}"></div>
+                        <div class="form-group"><label>Type</label><select class="form-select" id="f-type">
+                            <option value="public">Public</option><option value="national">National</option><option value="festival">Festival</option><option value="religious">Religious</option><option value="vacation">Vacation</option>
+                        </select></div>
+                        <div class="form-group full-width"><label>Description</label><textarea class="form-textarea" id="f-h-description">${data?.description||''}</textarea></div>
+                    </div>`; break;
+                case 'announcement':
+                    html = `<div class="form-grid">
+                        <div class="form-group full-width"><label>Title</label><input class="form-input" id="f-title" value="${data?.title||''}"></div>
+                        <div class="form-group full-width"><label>Content</label><textarea class="form-textarea" id="f-content" style="min-height:120px">${data?.content||''}</textarea></div>
+                        <div class="form-group"><label>Priority</label><select class="form-select" id="f-priority">
+                            <option value="normal">Normal</option><option value="high">High</option><option value="urgent">Urgent</option>
+                        </select></div>
+                        <div class="form-group"><label>Department</label><select class="form-select" id="f-department">
+                            <option value="">All Departments</option><option value="Computer Science">Computer Science</option><option value="Electronics">Electronics</option><option value="Mechanical">Mechanical</option><option value="Civil">Civil</option>
+                        </select></div>
+                        <div class="form-group"><label>Expires At</label><input type="date" class="form-input" id="f-expires_at" value="${data?.expires_at||''}"></div>
+                        <div class="form-group"><label>Pin to top</label><select class="form-select" id="f-is_pinned"><option value="0">No</option><option value="1" ${data?.is_pinned?'selected':''}>Yes</option></select></div>
+                    </div>`; break;
+                case 'course':
+                    html = `<div class="form-grid">
+                        <div class="form-group"><label>Code</label><input class="form-input" id="f-code" value="${data?.code||''}"></div>
+                        <div class="form-group"><label>Name</label><input class="form-input" id="f-name" value="${data?.name||''}"></div>
+                        <div class="form-group"><label>Department</label><select class="form-select" id="f-department">
+                            <option value="Computer Science">Computer Science</option><option value="Electronics">Electronics</option><option value="Mechanical">Mechanical</option><option value="Civil">Civil</option><option value="Electrical">Electrical</option>
+                        </select></div>
+                        <div class="form-group"><label>Semester</label><input type="number" class="form-input" id="f-semester" min="1" max="8" value="${data?.semester||1}"></div>
+                        <div class="form-group"><label>Credits</label><input type="number" class="form-input" id="f-credits" value="${data?.credits||3}"></div>
+                        <div class="form-group"><label>Instructor</label><input class="form-input" id="f-instructor" value="${data?.instructor||''}"></div>
+                        <div class="form-group full-width"><label>Schedule</label><input class="form-input" id="f-schedule" value="${data?.schedule||''}"></div>
+                        <div class="form-group full-width"><label>Description</label><textarea class="form-textarea" id="f-c-description">${data?.description||''}</textarea></div>
+                    </div>`; break;
+                case 'assignment':
+                    html = `<div class="form-grid">
+                        <div class="form-group full-width"><label>Title</label><input class="form-input" id="f-title" value=""></div>
+                        <div class="form-group full-width"><label>Description</label><textarea class="form-textarea" id="f-description"></textarea></div>
+                        <div class="form-group"><label>Course</label><select class="form-select" id="f-course_id">
+                            ${allCourses.map(c => `<option value="${c.id}">${c.code} - ${c.name}</option>`).join('')}
+                        </select></div>
+                        <div class="form-group"><label>Due Date</label><input type="date" class="form-input" id="f-due_date"></div>
+                        <div class="form-group"><label>Max Marks</label><input type="number" class="form-input" id="f-max_marks" value="100"></div>
+                        <div class="form-group"><label>Department</label><select class="form-select" id="f-department">
+                            <option value="Computer Science">Computer Science</option><option value="Electronics">Electronics</option><option value="Mechanical">Mechanical</option><option value="Civil">Civil</option>
+                        </select></div>
+                        <div class="form-group"><label>Semester</label><input type="number" class="form-input" id="f-semester" min="1" max="8" value="3"></div>
+                    </div>`; break;
+                case 'student':
+                    html = `<div class="form-grid">
+                        <div class="form-group"><label>Full Name</label><input class="form-input" id="f-full_name"></div>
+                        <div class="form-group"><label>Username</label><input class="form-input" id="f-username"></div>
+                        <div class="form-group"><label>Email</label><input type="email" class="form-input" id="f-email"></div>
+                        <div class="form-group"><label>Phone</label><input class="form-input" id="f-phone"></div>
+                        <div class="form-group"><label>Password</label><input type="password" class="form-input" id="f-password" value="student123"></div>
+                        <div class="form-group"><label>Department</label><select class="form-select" id="f-department">
+                            <option value="Computer Science">Computer Science</option><option value="Electronics">Electronics</option><option value="Mechanical">Mechanical</option><option value="Civil">Civil</option><option value="Electrical">Electrical</option>
+                        </select></div>
+                        <div class="form-group"><label>Semester</label><input type="number" class="form-input" id="f-semester" min="1" max="8" value="1"></div>
+                        <div class="form-group"><label>Enrollment No.</label><input class="form-input" id="f-enrollment_no"></div>
+                    </div>`; break;
+            }
+
+            document.getElementById('modal-body').innerHTML = html;
+            document.getElementById('modal-overlay').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+            currentEditId = null;
+        }
+
+        function getFormVal(id) { const el = document.getElementById(id); return el ? el.value : ''; }
+
+        async function submitModal() {
+            let url, method, body;
+            
+            switch(currentModalType) {
+                case 'event':
+                    body = { title: getFormVal('f-title'), description: getFormVal('f-description'), event_date: getFormVal('f-event_date'), event_time: getFormVal('f-event_time'), end_date: getFormVal('f-end_date'), location: getFormVal('f-location'), category: getFormVal('f-category'), is_featured: parseInt(getFormVal('f-is_featured')) };
+                    url = currentEditId ? `/api/events/${currentEditId}` : '/api/events';
+                    method = currentEditId ? 'PUT' : 'POST'; break;
+                case 'exam':
+                    body = { subject: getFormVal('f-subject'), exam_date: getFormVal('f-exam_date'), exam_time: getFormVal('f-exam_time'), duration_minutes: parseInt(getFormVal('f-duration_minutes')), room: getFormVal('f-room'), department: getFormVal('f-department'), semester: parseInt(getFormVal('f-semester')), exam_type: getFormVal('f-exam_type'), syllabus: getFormVal('f-syllabus') };
+                    url = currentEditId ? `/api/exams/${currentEditId}` : '/api/exams';
+                    method = currentEditId ? 'PUT' : 'POST'; break;
+                case 'holiday':
+                    body = { title: getFormVal('f-title'), holiday_date: getFormVal('f-holiday_date'), type: getFormVal('f-type'), description: getFormVal('f-h-description') };
+                    url = currentEditId ? `/api/holidays/${currentEditId}` : '/api/holidays';
+                    method = currentEditId ? 'PUT' : 'POST'; break;
+                case 'announcement':
+                    body = { title: getFormVal('f-title'), content: getFormVal('f-content'), priority: getFormVal('f-priority'), target_audience: 'all', department: getFormVal('f-department') || null, is_pinned: parseInt(getFormVal('f-is_pinned')), expires_at: getFormVal('f-expires_at') || null };
+                    url = currentEditId ? `/api/announcements/${currentEditId}` : '/api/announcements';
+                    method = currentEditId ? 'PUT' : 'POST'; break;
+                case 'course':
+                    body = { code: getFormVal('f-code'), name: getFormVal('f-name'), department: getFormVal('f-department'), semester: parseInt(getFormVal('f-semester')), credits: parseInt(getFormVal('f-credits')), instructor: getFormVal('f-instructor'), schedule: getFormVal('f-schedule'), description: getFormVal('f-c-description') };
+                    url = currentEditId ? `/api/courses/${currentEditId}` : '/api/courses';
+                    method = currentEditId ? 'PUT' : 'POST'; break;
+                case 'assignment':
+                    body = { title: getFormVal('f-title'), description: getFormVal('f-description'), course_id: parseInt(getFormVal('f-course_id')), due_date: getFormVal('f-due_date'), max_marks: parseInt(getFormVal('f-max_marks')), department: getFormVal('f-department'), semester: parseInt(getFormVal('f-semester')) };
+                    url = '/api/courses/assignments'; method = 'POST'; break;
+                case 'student':
+                    body = { full_name: getFormVal('f-full_name'), username: getFormVal('f-username'), email: getFormVal('f-email'), phone: getFormVal('f-phone'), password: getFormVal('f-password'), department: getFormVal('f-department'), semester: parseInt(getFormVal('f-semester')), enrollment_no: getFormVal('f-enrollment_no') };
+                    url = '/api/admin/students'; method = 'POST'; break;
+            }
+
+            try {
+                const result = await apiFetch(url, { method, body: JSON.stringify(body) });
+                if (result && !result.error) {
+                    showToast(`${currentModalType.charAt(0).toUpperCase()+currentModalType.slice(1)} saved successfully!`, 'success');
+                    closeModal();
+                    loadSection(currentModalType === 'student' ? 'students' : currentModalType + 's');
+                } else {
+                    showToast(result?.error || 'Error saving', 'error');
+                }
+            } catch (err) {
+                showToast('Error: ' + err.message, 'error');
+            }
+        }
+
+        async function editItem(type, id) {
+            const endpoints = { event: '/api/events/', exam: `/api/exams/`, holiday: null, announcement: null, course: null };
+            // For simplicity, fetch the item data from the list already in DOM and re-open modal
+            // In production, you'd fetch by ID
+            let data = null;
+            try {
+                if (type === 'event') data = await apiFetch(`/api/events/${id}`);
+            } catch(e) {}
+            openModal(type, data || { id });
+        }
+
+        async function deleteItem(endpoint, id) {
+            if (!confirm('Are you sure you want to delete this item?')) return;
+            try {
+                const result = await apiFetch(`/api/${endpoint}/${id}`, { method: 'DELETE' });
+                if (result && !result.error) {
+                    showToast('Deleted successfully', 'success');
+                    // Reload current section
+                    const section = endpoint.replace('admin/', '').replace('courses/', '');
+                    loadSection(section);
+                } else {
+                    showToast(result?.error || 'Error deleting', 'error');
+                }
+            } catch (err) {
+                showToast('Error: ' + err.message, 'error');
+            }
+        }
+
+        // ====== INIT ======
+        window.addEventListener('load', () => {
+            if (!checkAuth()) return;
+            const initials = currentUser.full_name.split(' ').map(n => n[0]).join('').substring(0, 2);
+            document.getElementById('sidebar-avatar').textContent = initials;
+            document.getElementById('sidebar-name').textContent = currentUser.full_name;
+            const now = new Date();
+            document.getElementById('topbar-date').innerHTML = `📅 ${now.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`;
+            loadAdminDashboard();
+            // Pre-load courses for assignment modal
+            apiFetch('/api/courses').then(c => { if(c) allCourses = c; });
+        });
+    </script>
+</body>
+</html>
